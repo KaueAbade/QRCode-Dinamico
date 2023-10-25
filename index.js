@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 let predefinedURL = config.serverConfig.predefinedURL;
-let port = config.serverConfig.port;
+let PORT = config.serverConfig.port;
 
 let qrCodeFolder = config.folderConfig.qrCodeFolder;
 let publicFolder = config.folderConfig.publicFolder;
@@ -166,5 +166,5 @@ app.use(`/${publicFolder}`, express.static('${publicFolder}'));
 
 // Abre e loga em qual porta o Express está rodando
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
