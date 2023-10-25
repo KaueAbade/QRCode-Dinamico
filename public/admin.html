@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code List</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/styles.css">
+    <style>
+        .container {
+            max-width: 975px;
+        }
+        input[type="url"] {
+            width: 63%;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href = '/'">&#x2302;</button>
+    <div class="container">
+        <h1>Lista de QRCodes</h1>
+        <ul id="data-list">
+        </ul>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch('/admin/getdata')
+          .then(response => response.json())
+          .then(data => {
+            const dataList = document.getElementById('data-list');
+            data.forEach(entry => {
+              const listItem = document.createElement('li');
+              listItem.innerHTML = `
+                <div class="uuid" style="display: none;">${entry.UUID}</div>
+                <div>
+                  <strong>Nome:</strong> ${entry.name}<br>
+                  <strong>URL:</strong> ${entry.sourceURL}<br>
+                  <strong>URL para redirecionamento:</strong> 
+                  <input type="url" name="redirectURL" value="${entry.redirectURL}" readonly>
+                </div>
+                <div class="button-container">
+                  <button class="btn" onclick="editEntry(event)">Editar</button>
+                  <button class="btn" onclick="deleteEntry(event)">Deletar</button>
+                  <button class="btn" onclick="downloadQRCode(event, '${entry.UUID}', '${entry.name}')">Download</button>
+                </div>
+                <div class="qrcode">
+                  <img src="/public/qrcodes/${entry.UUID}.png">
+                </div>`;
+              dataList.appendChild(listItem);
+            });
+          })
+          .catch(error => console.error('Erro ao acessar a database:', error));
+      });
+
+      function editEntry(event) {
+            const button = event.target;
+            const listItem = button.parentElement.parentElement;
+            const uuid = listItem.querySelector(".uuid").textContent;
+            let newRedirectURL = prompt('Digite o novo URL para redirecionamento:');
+
+            if (newRedirectURL) {
+                if (newRedirectURL.startsWith("http://")) {
+                    if (isValidURL(newRedirectURL)) {
+                        makeEditRequest(uuid, newRedirectURL);
+                    } else {
+                        alert('URL inválido. Por favor entre um URL válido.');
+                    }
+                }
+                else if (newRedirectURL.startsWith("https://")) {
+                    if (isValidURL(newRedirectURL)) {
+                        makeEditRequest(uuid, newRedirectURL);
+                    } else {
+                        alert('URL inválido. Por favor entre um URL válido.');
+                    }
+                }
+
+                else {
+                    newRedirectURL = "http://" + newRedirectURL;
+                    if (isValidURL(newRedirectURL)) {
+                        makeEditRequest(uuid, newRedirectURL);
+                    } else {
+                        alert('URL inválido. Por favor entre um URL válido.');
+                    }
+                }
+            }
+        }
+
+        function isValidURL(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function makeEditRequest(uuid, newRedirectURL) {
+            fetch(`/edit/${uuid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ redirectURL: newRedirectURL })
+            })
+            .then(() => {
+                refreshList();
+            })
+            .catch(error => console.error('Erro ao editar o URL:', error));
+        }
+
+      function deleteEntry(event) {
+          const button = event.target;
+          const listItem = button.parentElement.parentElement;
+          const uuid = listItem.querySelector(".uuid").textContent;
+          if (confirm('Você tem certeza que deseja deletar esse QRCode??')) {
+              fetch(`/delete/${uuid}`, {
+                  method: 'DELETE'
+              })
+              .then(() => {
+                  refreshList();
+              })
+              .catch(error => console.error('Erro ao deletar o QRCode:', error));
+          }
+      }
+
+      function downloadQRCode(event, UUID, name) {
+          event.preventDefault();
+
+          const link = document.createElement('a');
+          link.href = `/public/qrcodes/${UUID}.png`;
+          link.download = `${name}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      }
+
+      function refreshList() {
+          const dataList = document.getElementById('data-list');
+          dataList.innerHTML = '';
+
+          fetch('/admin/getdata')
+              .then(response => response.json())
+              .then(data => {
+                  data.forEach(entry => {
+                      const listItem = document.createElement('li');
+                      listItem.innerHTML = `
+                <div class="uuid" style="display: none;">${entry.UUID}</div> <!-- Hidden UUID -->
+                <div>
+                  <strong>Nome:</strong> ${entry.name}<br>
+                  <strong>URL:</strong> ${entry.sourceURL}<br>
+                  <strong>URL para redirecionamento:</strong> 
+                  <input type="url" name="redirectURL" value="${entry.redirectURL}" readonly>
+                </div>
+                <div class="button-container">
+                  <button class="btn" onclick="editEntry(event)">Editar</button>
+                  <button class="btn" onclick="deleteEntry(event)">Deletar</button>
+                  <button class="btn" onclick="downloadQRCode(event, '${entry.UUID}', '${entry.name}')">Download</button>
+                </div>
+                <div class="qrcode">
+                  <img src="/public/qrcodes/${entry.UUID}.png">
+                </div>`;
+                      dataList.appendChild(listItem);
+                  });
+              })
+              .catch(error => console.error('Erro ao acessar a database:', error));
+      }
+    </script>
+</body>
+</html>

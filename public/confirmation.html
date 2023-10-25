@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Página de confirmação</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/styles.css">
+    <style>
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href = '/'">&#x2302;</button>
+    <div class="container">
+        <div>
+            <strong>QRCode gerado</strong><br><br>
+        </div>
+        <div class="qrcode">
+            <img id="qrCodeImage">
+        </div>
+        <div class="button-container">
+            <button class="btn" onclick="downloadQRCode(event)">Download</button>
+            <button class="btn" onclick="window.location.href = '/qrcodeform/'">Voltar</button>
+        </div>
+    </div>
+    <script>
+        let name;
+        let qrCodePath;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/qrcodeform/submit/getdata')
+                .then(response => response.json())
+                .then(data => {
+                    const qrCodeImage = document.getElementById('qrCodeImage');
+                    qrCodePath = `/public/qrcodes/${data.UUID}.png`
+                    qrCodeImage.src = qrCodePath;
+
+                    name = data.name;
+                })
+                .catch(error => {
+                    console.error('Failed to fetch data:', error);
+                });
+        });
+
+        function downloadQRCode(event) {
+            event.preventDefault(); 
+
+            const link = document.createElement('a');
+            link.href = qrCodePath;
+            link.download = `${name}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

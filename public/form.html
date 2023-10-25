@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário para gerar QRCode</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/styles.css">
+    <style>
+        input[type="text"],
+        input[type="url"] {
+            width: 98.5%;
+        }
+    </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.location.href = '/'">&#x2302;</button>
+  <div class="container">
+    <h1>Formulário para gerar QRCodes</h1>
+    <form action="/qrcodeform/submit" method="post">
+      <div class="form-group">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="redirectURL">URL:</label>
+        <input type="text" id="redirectURL" name="redirectURL" required>
+      </div>
+      <div class="button-container">
+        <button class="btn" type="submit">Gerar QRCode</button>
+        <button class="btn" type="reset">Limpar os campos</button>
+      </div>
+    </div>
+    </form>
+  </div>
+  <script>
+      document.querySelector('form').addEventListener('submit', function (event) {
+          const redirectURLInput = document.getElementById('redirectURL');
+          const redirectURLValue = redirectURLInput.value.trim();
+
+          if (redirectURLValue) {
+              if (redirectURLValue.startsWith('http://')) {
+                  redirectURLValue = redirectURLValue;
+              } else if (redirectURLValue.startsWith('https://')) {
+                  redirectURLValue = redirectURLValue;
+              } else {
+                  redirectURLValue = 'http://' + redirectURLValue;
+              }
+
+              if (isValidURL(redirectURLValue)) {
+                  redirectURLInput.value = redirectURLValue;
+              } else {
+                alert('URL inválido. Por favor entre um URL válido.');
+                  event.preventDefault();
+              }
+          }
+      });
+
+      function isValidURL(url) {
+          try {
+              new URL(url);
+              return true;
+          } catch (error) {
+              return false;
+          }
+      }
+  </script>
+</body>
+</html>

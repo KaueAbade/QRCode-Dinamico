@@ -1,0 +1,20 @@
+{
+  "serverConfig": {
+      "predefinedURL": "http://qrcodedinamico.ddns.net/",
+      "port": 8080
+  },
+  "folderConfig": {
+    "publicFolder": "public",
+    "qrCodeFolder": "qrcodes"
+  },
+  "databaseConfig": {
+    "qrCodeDatabaseFile": "qrCodeDatabase.json"
+  },
+  "pageConfig": {
+      "adminPage": "admin.html",
+      "confirmationPage": "confirmation.html",
+      "formPage": "form.html",
+      "indexPage": "index.html",
+      "redirectPage": "redirect.html"
+  }
+}
