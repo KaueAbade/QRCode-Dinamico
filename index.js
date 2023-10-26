@@ -47,9 +47,9 @@ async function generateQRCode(qrCodePath, sourceURL) {
 }
 
 // Funcao para ler a database dos qrcodes
-function readQrCodeDataBase() {
-  const database = fs.readFileSync(qrCodeDatabaseFile, 'utf8');
-  return JSON.parse(qrCodeDatabaseFile);
+function readQRCodeDatabase() {
+  const qrCodeDatabase = fs.readFileSync(qrCodeDatabaseFile, 'utf8');
+  return JSON.parse(qrCodeDatabase);
 }
 
 // Funcao para gerar o UUID
@@ -80,7 +80,7 @@ app.post('/qrcodeform/submit', async (req, res) => {
   await generateQRCode(qrCodePath, sourceURL);
 
   // Le a database dos qrcodes
-  const qrCodeDatabase = readQrCodeDataBase();
+  const qrCodeDatabase = readQRCodeDatabase();
 
   qrCodeDatabase.push({
     UUID,
@@ -113,12 +113,12 @@ app.get('/redirect/:uuid', (req, res) => {
 
   // Recupera o UUID e le a databse
   const uuid = req.params.uuid;
-  const qrCodeDatabase = readQrCodeDataBase();
+  const qrCodeDatabase = readQRCodeDatabase();
 
   // Encontra o UUID na database
   const record = qrCodeDatabase.find(item => item.UUID === uuid);
 
-  if (record) {
+  if (record) { 
     // Redireciona para o redirectURL correspondente ao UUID encontrado
     const redirectURL = record.redirectURL;
     res.redirect(redirectURL);
@@ -133,26 +133,26 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/admin/getdata', (req, res) => {
-  const data = readQrCodeDataBase(); 
+  const data = readQRCodeDatabase(); 
   res.json(data);
 });
 
 app.post('/edit/:uuid', (req, res) => {
   const uuid = req.params.uuid;
-  const newData = readQrCodeDataBase().map(entry => {
+  const newData = readQRCodeDatabase().map(entry => {
       if (entry.UUID === uuid) {
           entry.redirectURL = req.body.redirectURL;
       }
       return entry;
   });
-  fs.writeFileSync(databaseFile, JSON.stringify(newData, null, 2));
+  fs.writeFileSync(qrCodeDatabaseFile, JSON.stringify(newData, null, 2));
   res.sendStatus(200);
 });
 
 app.delete('/delete/:uuid', (req, res) => {
   const uuid = req.params.uuid;
-  const newData = readQrCodeDataBase().filter(entry => entry.UUID !== uuid);
-  fs.writeFileSync(databaseFile, JSON.stringify(newData, null, 2));
+  const newData = readQRCodeDatabase().filter(entry => entry.UUID !== uuid);
+  fs.writeFileSync(qrCodeDatabaseFile, JSON.stringify(newData, null, 2));
   res.sendStatus(200);
 });
 

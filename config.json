@@ -1,6 +1,6 @@
 {
   "serverConfig": {
-      "predefinedURL": "http://qrcodedinamico.ddns.net/",
+      "predefinedURL": "http://qrcodedinamico.ddns.net",
       "port": 8080
   },
   "folderConfig": {
