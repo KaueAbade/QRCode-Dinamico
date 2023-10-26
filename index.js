@@ -94,7 +94,7 @@ app.post('/qrcodeform/submit', async (req, res) => {
   fs.writeFileSync(qrCodeDatabaseFile, JSON.stringify(qrCodeDatabase, null, 2));
 
   // Envia a pagina de confirmação para o usuário
-  res.sendFile(path.join(__dirname, publicFolder, qrCodeConfirmationPage));
+  res.sendFile(path.join(__dirname, publicFolder, confirmationPage));
 });
 
 // Express envia a data de UUID e Nome do qrcode para a pagina de confimação
@@ -133,13 +133,13 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/admin/getdata', (req, res) => {
-  const data = readDataBase(); 
+  const data = readQrCodeDataBase(); 
   res.json(data);
 });
 
 app.post('/edit/:uuid', (req, res) => {
   const uuid = req.params.uuid;
-  const newData = readDataBase().map(entry => {
+  const newData = readQrCodeDataBase().map(entry => {
       if (entry.UUID === uuid) {
           entry.redirectURL = req.body.redirectURL;
       }
@@ -151,7 +151,7 @@ app.post('/edit/:uuid', (req, res) => {
 
 app.delete('/delete/:uuid', (req, res) => {
   const uuid = req.params.uuid;
-  const newData = readDataBase().filter(entry => entry.UUID !== uuid);
+  const newData = readQrCodeDataBase().filter(entry => entry.UUID !== uuid);
   fs.writeFileSync(databaseFile, JSON.stringify(newData, null, 2));
   res.sendStatus(200);
 });
