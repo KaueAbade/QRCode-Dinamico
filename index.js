@@ -162,7 +162,7 @@ app.use((err, req, res, next) => {
 });
 
 // Aponta a pasta pública para o Express
-app.use(`/${publicFolder}`, express.static('${publicFolder}'));
+app.use(`/${publicFolder}`, express.static(`${publicFolder}`));
 
 // Abre e loga em qual porta o Express está rodando
 app.listen(PORT, () => {
